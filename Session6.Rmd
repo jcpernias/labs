@@ -1,0 +1,322 @@
+---
+title: "Sexta sesión de laboratorio"
+author: "José C. Pernías"
+date: "17/04/2015"
+output:
+  ioslides_presentation:
+    fig_height: 4.29
+    fig_width: 6
+    smaller: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.align='center', echo = FALSE)
+
+source("labdata.R")
+
+library(ggplot2)
+library(knitr)
+
+
+addLab <- function(df, lab) {
+  df$lab <- lab
+  df  
+}
+
+lab01 <- readSubjectsTables("LA01.xls")
+lab01 <- llply(lab01, addLab, 1)
+lab02 <- readSubjectsTables("LA02.xls")
+lab02 <- llply(lab02, addLab, 2)
+lab03 <- readSubjectsTables("LA03.xls")
+lab03 <- llply(lab03, addLab, 3)
+
+T1 <- rbind.fill(lab01$T1, lab02$T1, lab03$T1) %>%
+  mutate(Lab = as.factor(lab), Period = as.factor(Period), 
+         Subject = as.factor(lab * 100 + Subject),
+         Market = as.factor((matching - 1)* 2 + mercado),
+         qi = cantidad, Qi = otracantidad) %>%
+  select(Lab, Treatment, Period, Subject, Market, qi, Qi)
+
+T2 <- rbind.fill(lab01$T2, lab02$T2, lab03$T2) %>%
+  mutate(Lab = as.factor(lab), Period = as.factor(Period), 
+         Subject = as.factor(lab * 100 + Subject),
+         Market = as.factor((matching - 1)* 2 + mercado),
+         qi = cantidad, Qi = otracantidad) %>%
+  select(Lab, Treatment, Period, Subject, Market, qi, Qi)
+
+T3 <- rbind.fill(lab01$T3, lab02$T3, lab03$T3) %>%
+  mutate(Lab = as.factor(lab), Period = as.factor(Period), 
+         Subject = as.factor(lab * 100 + Subject),
+         Market = as.factor((matching - 1)* 2 + mercado),
+         qi = cantidad, Qi = otracantidad) %>%
+  select(Lab, Treatment, Period, Subject, Market, qi, Qi) %>%
+  filter(Lab != 2 | Period %in% 1:5 | qi > 0)
+
+q1 <- T1 %>% select(Period, Subject, qT1 = qi)
+q2 <- T2 %>% select(Period, Subject, qT2 = qi)
+q3 <- T3 %>% select(Period, Subject, qT3 = qi)
+
+qall <- q1 %>% right_join(q2) %>% right_join(q3) %>%
+  mutate(dT2 = qT2 - qT1, dT3 = qT3 - qT1)
+```
+
+## Tratamiento 1
+
+- Cuatro empresas sirven el mercado de un producto homogéneo.
+- Cada unidad producida tiene un coste unitario de \(200\ €\).
+- Cada periodo las empresas deciden simultáneamente cuántas unidades va a producir.
+- La demanda determina el precio al que se venden todas las unidades.
+
+## Producción
+
+- Consideremos la decisión de producción de una de las empresas. La empresa 1 produce $q_1$ unidades.
+- La producción de sus rivales es:
+  \[
+    Q_{-1} = q_2 + q_3 + q_4
+  \]
+- La producción del mercado es:
+  \[ Q = q_1 + Q_{-1} \]
+
+## Demanda
+
+- La curva inversa de demanda del mercado es:
+  \[
+     P = 500 - \frac{1}{2} Q
+  \]
+
+- Por tanto:
+  \[
+     P = 500 - \frac{1}{2} Q_{-1} - \frac{1}{2} q_1
+  \]
+
+- Ingreso marginal de la empresa 1:
+  \[
+     IMg_1(q_1) = \frac{\mathrm{d}\; I_1(q_1)}{\mathrm{d}\; q_1} = 
+     500 - \frac{1}{2} Q_{-1}  - q_1
+  \]
+
+## Maximización de los beneficios
+
+- Condición de primer orden para la maximización de los beneficios:
+  \[
+    IMg_1(q_1) = 500 - \frac{1}{2} Q_{-1}  - q^*_1 = 200 = CMg_1
+  \]
+
+- Reordenando la expresión anterior, obtenemos la función de reacción de la empresa 1:
+  \[
+      q_1^* = 300 - \frac{1}{2} Q_{-1} 
+  \]
+  
+## Equilibrio de Nash
+- Cada empresa tiene una función de reacción similar a la de la empresa 1.
+  \[
+      q_i^* = 300 - \frac{1}{2} Q_{-i}; \qquad i = 1, 2, 3, 4.
+  \]
+
+- El mercado es simétrico: en equilibrio todas las empresas producen lo mismo:
+  \[ q^*_1 = q^*_2 = q^*_3 = q^*_4 \]
+
+- Sustituyendo $Q^*_{-1} = 3 q^*_1$ en la función de reacción de la empresa 1:
+  \[ q^*_1 = 300 - - \frac{3}{2}  q^*_1 \]
+
+## Equilibrio
+- La producción de equilibrio de las empresas es:
+  \[ q^*_ 1 = q^*_2 = q^*_3 = q^*_4 = 120\ \text{u.} \]
+- La producción de mercado es:
+  \[ Q^* = 4 q^*_1 = 480\ \text{u.}\]
+- El precio de equilibrio es:
+  \[ P^* = 500 - \frac{1}{2} 480 = 260\ \text{€/u.} \]
+- El beneficio de cada empresa es:
+  \[ \pi^*_ 1 = \pi^*_2 = \pi^*_3 = \pi^*_4 = (260 - 200) 120 = 7\,200\ \text{€} \]
+ 
+## Resultados del laboratorio
+
+- Sesiones del 14 de abril (grupo A) de 2015.
+- Cada tratamiento estaba compuesto por 7 periodos.
+- Número de sujetos: `r NROW(T1)/7`.
+
+## Estadísticos descriptivos
+### Tratamiento 1: Producción
+
+
+```{r}
+
+kable(ddply (T1, .(Period), summTable, "qi"),
+      digits = 1)      
+```
+
+## Distribución de la producción
+### Tratamiento 1
+
+```{r}
+
+ggplot(T1, aes(Period, qi)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = 120, color = "DarkGreen", size = 1, alpha = 0.5) +
+  ylab(expression(q[i])) 
+
+```
+
+## Tratamientos 2 y 3
+
+* En estos tratamientos se añaden características que pueden facilitar la colusión entre las empresas de cada mercado:
+    - __Tratamiento 2__: En todos los períodos, cada mercado está formado por las mismas cuatro empresas.
+    - __Tratamiento 3__: Los mercados no cambian a lo largo de los siete períodos y las empresas se pueden comunicar entre sí.
+
+
+## Colusión
+- La solución cooperativa implica que las empresas fijan sus estrategias para maximizar el beneficio conjunto:
+  \[ \Pi_C = \pi_1 + \pi_2 + \pi_3 + \pi_4 \]
+- También podemos escribir el beneficio conjunto como:
+  \[ \Pi_C = I_C - C_C \]
+  donde $I_C$ y $C_C$ son la suma de los ingresos y de los costes,respectivamente, de las empresas en el mercado.
+
+## Ingresos
+
+- Curva (inversa) de demanda de mercado:
+  \[
+     P = 500 - \frac{1}{2} Q
+  \]
+
+- Ingreso conjunto:
+  \[
+    \begin{align*}
+    I_C &= I_1(q_1) + I_2(q_2) +I_3(q_3) +I_4(q_4) \\[2ex]
+    &= P(Q) q_1 + P(Q) q_2 + P(Q) q_3 + P(Q) q_4 \\[2ex]
+    & =  P(Q) Q  = 500 Q - \frac{1}{2} Q^2
+    \end{align*}
+  \]
+
+  
+## Costes
+
+- Función de costes de la empresa:
+  \[
+    C_i(q_i) = 200 q_i; \qquad i = 1, 2, 3, 4. 
+  \]
+
+- El coste conjunto es:
+  \[
+    \begin{align*}
+    C_C &= C_1(q_1) + C_2(q_2) +C_3(q_3) +C_4(q_4) \\[2ex]
+    &= 200 q_1 + 200 q_2 + 200 q_3 + 200 q_4 \\[2ex]
+    & =  200 Q
+    \end{align*}
+  \]
+
+## Beneficio conjunto
+
+- En este caso tanto los ingresos como los costes conjuntos sólo dependen de la cantidad total:
+  \[
+    \begin{gather*}
+    I_C(Q) = 500 Q - \frac{1}{2} Q^2 \\[2ex]
+    C_C(Q) =  200 Q
+    \end{gather*}
+  \]
+  
+- La solución cooperativa _en este caso_ es idéntica a la solución de monopolio.
+  
+## Elección del nivel de producción
+
+
+- Condición de primer orden para la maximización del beneficio conjunto: 
+  \[ IMg_C(Q^*) = CMg_C(Q^*) \]
+- En nuestro caso:
+  \[
+     IMg_C(Q^*) = 500 - Q^* = 200 = CMg_C(Q^*)
+  \]
+
+- Por tanto
+  \[
+    Q^* = 300\ \text{u.}; \quad
+    P^* = 350\ \text{€/u.}; \quad
+    \Pi_C^* = 45000\ \text{€}.
+  \]
+
+## Producción y beneficios de las empresas
+
+- Las empresas son idénticas.
+- El nivel de producción es igual para todas las empresas:
+  \[ q^*_1 = q^*_2 = q^*_3 = q^*_4 = Q^*/4 = 75\ \text{u.}\]
+- Los beneficios de las empresas son:
+  \[ \pi^*_1 = \pi^*_2 = \pi^*_3 = \pi^*_4 = (350 - 200) 75 = 11\,250\ \text{€}\]
+
+
+
+## Estadísticos descriptivos
+### Tratamiento 2: Producción
+
+
+```{r}
+
+kable(ddply (T2, .(Period), summTable, "qi"),
+      digits = 1)      
+
+```
+
+
+## Distribución de la producción
+### Tratamiento 2
+
+```{r}
+
+ggplot(T2, aes(Period, qi)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = 120, color = "DarkGreen", size = 1, alpha = 0.5) +
+  geom_hline(yintercept = 75, color = "DarkRed", size = 1, alpha = 0.5) +
+  ylab(expression(q[i])) 
+
+```
+
+## Estadísticos descriptivos
+### Tratamiento 3: Producción
+
+
+```{r}
+
+kable(ddply (T3, .(Period), summTable, "qi"),
+      digits = 1)      
+
+```
+
+## Distribución de la producción
+### Tratamiento 3
+
+```{r}
+
+ggplot(T3, aes(Period, qi)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = 120, color = "DarkGreen", size = 1, alpha = 0.5) +
+  geom_hline(yintercept = 75, color = "DarkRed", size = 1, alpha = 0.5) +
+  ylab(expression(q[i])) 
+
+```
+
+## Comparación de las producciones
+### Tratamiento 2 y Tratamiento 1
+
+```{r}
+
+ggplot(qall, aes(Period, dT2)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "DarkGreen", size = 1, alpha = 0.5) +
+  geom_hline(yintercept = -45, color = "DarkRed", size = 1, alpha = 0.5) +
+  ylab(expression(q[T2] - q[T1])) 
+
+```
+
+
+## Comparación de las producciones
+### Tratamiento 3 y Tratamiento 1
+
+```{r}
+
+ggplot(qall, aes(Period, dT3)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "DarkGreen", size = 1, alpha = 0.5) +
+  geom_hline(yintercept = -45, color = "DarkRed", size = 1, alpha = 0.5) +
+  ylab(expression(q[T3] - q[T1])) 
+
+```
+
+

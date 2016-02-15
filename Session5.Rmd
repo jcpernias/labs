@@ -1,0 +1,157 @@
+---
+title: "Quinta sesión de laboratorio"
+author: "José C. Pernías"
+date: "13/04/2015"
+output:
+  ioslides_presentation:
+    fig_height: 4.29
+    fig_width: 6
+    smaller: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.align='center', echo = FALSE)
+
+library(MASS)
+
+source("labdata.R")
+
+library(ggplot2)
+library(knitr)
+
+
+lab01 <- readSubjectsTables("LA01.xls")
+lab02 <- readSubjectsTables("LA02.xls")
+lab03 <- readSubjectsTables("LA03.xls")
+lab16 <- readSubjectsTables("LA16.xls")
+lab17 <- readSubjectsTables("LA17.xls")
+
+Bt1 <- rbind.fill (lab01$T1, lab02$T1, lab03$T1, lab16$T1, lab17$T1)
+
+Bt1 <- Bt1 %>% mutate(Period = as.factor(Period))
+
+```
+
+## Tratamiento 1
+
+* Dos empresas venden su producción en un mercado.
+* Cada empresa produce una variedad diferente de un mismo producto.
+* El coste de producción unitario de las dos empresas es de\ \(200\ €\).
+* Cada empresa decide simultáneamente a qué precio vende su producción.
+
+## Demanda (I)
+
+- Curvas de demanda de cada empresa:
+  \[\begin{gather*}
+    q_1 = \frac{2000}{3} - \frac{8}{3} p_1 + \frac{4}{3} p_2 \\
+    q_2 = \frac{2000}{3} + \frac{4}{3} p_1 - \frac{8}{3} p_2 
+    \end{gather*}
+  \]
+
+- El producto no es homogéneo: la empresa que fija el precio más elevado no pierde todos sus clientes.
+
+- Las demandas de las empresas son simétricas: obtenemos la curva de demanda de una de las empresas intercambiando los subíndices de la función de demanda de la otra empresa.
+
+## Demanda (y II)
+
+- Las curvas de demanda tienen pendiente negativa:
+  \[
+    \frac{\mathrm{d}\;q_1}{\mathrm{d}\;p_1} = -\frac{8}{3} > 0; \qquad
+    \frac{\mathrm{d}\;q_2}{\mathrm{d}\;p_2} = -\frac{8}{3} > 0.
+  \]
+- Las variedades que producen las empresas son sustitutivas:
+  \[
+    \frac{\mathrm{d}\;q_1}{\mathrm{d}\;p_2} = \frac{4}{3} > 0; \qquad
+    \frac{\mathrm{d}\;q_2}{\mathrm{d}\;p_1} = \frac{4}{3} > 0.
+  \]
+
+## Ingresos
+- Ingresos de la empresa 1:
+  \[
+    I_1 = p_1 q_1 = \frac{2000}{3} p_1 - \frac{8}{3} p^2_1 + \frac{4}{3} p_1 p_2
+  \]
+- Derivada de los ingresos con respecto del precio:
+  \[
+     \frac{\mathrm{d}\;I_1}{\mathrm{d}\;p_1}
+     = \frac{2000}{3} - \frac{16}{3} p_1 + \frac{4}{3} p_2
+  \]
+
+## Costes
+- Los costes de las dos empresas son idénticos:
+  \[
+    CMg_1 = CMg_2 = 200\ \text{€/u.}
+  \]
+- Derivada de los costes con respecto del precio:
+  \[
+     \frac{\mathrm{d}\;C_1}{\mathrm{d}\;p_1} = 
+     \frac{\mathrm{d}\;C_1}{\mathrm{d}\;q_1}
+     \frac{\mathrm{d}\;q_1}{\mathrm{d}\;p_1} = 
+     200 \cdot \left(-\frac{8}{3}\right) = -\frac{1600}{3}
+  \]
+
+## Maximización de los beneficios
+- Condición de primer orden para la maximización de beneficios:
+  \[
+     \frac{\mathrm{d}\;I_1}{\mathrm{d}\;p_1} =
+     \frac{2000}{3} - \frac{16}{3} p^*_1 + \frac{4}{3} p_2 =
+     -\frac{1600}{3} = 
+     \frac{\mathrm{d}\;C_1}{\mathrm{d}\;p_1}  
+  \]
+
+- Función de reacción de la empresa 1:
+  \[
+      p^*_1 = 225 + \frac{1}{4} p_2
+  \]
+
+## Equilibrio de Nash
+
+- Cada empresa obtiene los mejores resultados posibles, dadas las estrategias que han seleccionado sus rivales.
+  \[\begin{gather*}
+      p^*_1 = 225 + \frac{1}{4} p^*_2 \\
+      p^*_2 = 225 + \frac{1}{4} p^*_1 \\
+    \end{gather*}
+  \]
+
+## Equilibrio
+
+- En equilibrio, los precios fijados por las empresas son iguales: 
+  \[ p^*_1 = p^*_2 = 300\ \text{€/u.} \]
+- Sustituyendo los precios en las funciones de demanda, se obtienen las cantidades que produce cada empresa:
+  \[ q^*_1 = q^*_2 = \frac{800}{3} \approx 266.67\ \text{u.} \]
+- Beneficios:
+  \[ \pi^*_1 = \pi^*_2 = (300 - 200) \frac{800}{3}\approx 26\,666.67\ \text{€} \].
+  
+ 
+## Resultados del laboratorio
+
+- Sesiones del 16 de marzo (grupo F) y 31 de marzo (grupo A) de 2015.
+- Cada tratamiento estaba compuesto por 7 periodos.
+- Número de sujetos: `r NROW(Bt1)/7`.
+
+## Estadísticos descriptivos
+### Precios
+
+
+```{r}
+
+kable(ddply (Bt1, .(Period), summTable, "precio"),
+  digits = 1)      
+
+```
+
+
+
+## Distribución de los precios
+
+```{r}
+
+ggplot(Bt1, aes(Period, precio)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = 300, color = "DarkGreen", size = 1, alpha = 0.5) +
+  ylab("p") 
+
+```
+
+
+
+

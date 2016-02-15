@@ -1,0 +1,267 @@
+---
+title: "Primera sesión de laboratorio"
+author: "José C. Pernías"
+date: "08/02/2015"
+output: ioslides_presentation
+---
+
+```{r, include=FALSE}
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+
+load("ses1.RData")
+
+
+
+T1 <- filter(ses1, Treatment == 1)
+T2 <- filter(ses1, Treatment == 2)
+
+labels <- c("Mean", "SD", "Min.", "  25%", "Median", "  75%", "Max.")
+
+summP <- function (df) {
+  p <- df$Price
+  setNames (c(mean(p), sd(p), quantile(p)), labels)
+}
+
+summQ <- function (df) {
+  q <- df$Quantity
+  setNames (c(mean(q), sd(q), quantile(q)), labels)
+}
+
+cummProf <- function(df) {
+  q <- df$Quantity
+  p <- df$Price
+  c(CummProf = sum ((p - 200) * q))  
+}
+
+```
+
+
+
+## Tratamiento 1
+
+* Una única empresa sirve el mercado de un producto.
+* Cada unidad vendida tiene un coste unitario de \(200\ €\).
+* La empresa elige a qué precio vende cada unidad de su producto.
+* Los consumidores deciden cuántas unidades compran a ese precio.
+
+## Ingresos
+
+- La curva de demanda de la empresa es:
+  \[
+    Q(P) = 1000 - 2 P
+  \]
+
+- Podemos escribir los ingresos totales como:
+  \[
+    I = P Q(P) = 1000 P - 2 P^2
+  \]
+  
+## Costes
+
+- El coste unitario es independiente de la producción:
+  \[
+    CMe(Q) = 200 
+  \]
+
+- El coste total es:
+  \[
+    C(Q) = 200 Q
+  \]
+
+- Podemos expresar los costes en función de los precios sustituyendo en la expresión anterior la función de demanda:
+  \[
+    C = 200 Q(P) = 200000 - 400 P
+  \]
+
+## Beneficios
+
+- Obtenemos los beneficios como diferencia de ingresos y costes:
+  \[
+    \pi = I - C
+  \]
+- En nuestro caso:
+  \[
+    \pi = 1000 P - 2 P^2 - (200000 - 400 P)
+  \]
+- Operando en la expresión anterior:
+  \[
+    \pi = - 200000  + 1400 P - 2 P^2
+  \]
+  
+## Elección del precio
+- Si la empresa maximiza beneficios, fijará un precio $P^*$ de forma que:
+  \[
+   \frac{\mathrm{d}\; \pi(P^*)}{\mathrm{d}\; P} = 0
+  \]
+
+- La derivada de $\pi$ con respecto al precio es:
+  \[
+   \frac{\mathrm{d}\; \pi(P)}{\mathrm{d}\; P} = 1400 - 4 P
+  \]
+- Por tanto
+  \[
+    P^* = 350\ \text{€/u.}; \quad
+    Q^* = 300\ \text{u.}; \quad
+    \pi^* = 45000\ \text{€}.
+  \]
+  
+
+## Resultados del laboratorio
+
+- Sesiones del 2 de febrero (grupo F) y 3 de febrero (grupo A) de 2015.
+- Cada tratamiento estaba compuesto por 7 periodos.
+- Número de sujetos: ```r length (unique(ses1$Subject))```
+
+## Estadísticos descriptivos
+
+
+```{r, echo = FALSE}
+kable(ddply (T1, .(Period), summP), digits = 1)
+```
+
+
+## Distribución de los precios
+
+```{r, echo=FALSE}
+ggplot(T1, aes(Period, Price)) + 
+  geom_boxplot(fill="orange", alpha = 0.3)
+```
+
+## Distribución de los precios
+
+### Primer periodo 
+
+```{r, echo=FALSE}
+ggplot(filter(T1, Period == 1), 
+       aes(x = Price)) + 
+  geom_density(fill = "red", alpha = 0.3) 
+```
+
+## Distribución de los precios
+
+### Último periodo 
+
+
+```{r, echo=FALSE}
+ggplot(filter(T1, Period == 7), 
+       aes(x = Price, fill = Period)) + 
+  geom_density(fill = "blue", alpha = 0.3) 
+```
+
+
+## Distribución de los precios
+
+### Primer y último periodo 
+
+```{r, echo=FALSE}
+ggplot(filter(T1, Period == 1 | Period == 7), 
+       aes(x = Price, fill = Period)) + 
+  geom_density(alpha = 0.3) 
+```
+
+## Tratamiento 2
+
+* Una única empresa sirve el mercado de un producto.
+* Cada unidad vendida tiene un coste unitario de \(200\ €\).
+* La empresa selecciona la cantidad que produce.
+* La demanda determina el precio al que se vende cada unidad.
+
+## Ingresos
+
+- Curva (inversa) de demanda de la empresa:
+  \[
+     P = 500 - \frac{1}{2} Q
+  \]
+
+- Ingreso total:
+  \[
+    I(Q) = P(Q) Q = 500 Q - \frac{1}{2} Q^2
+  \]
+
+- Ingreso marginal:
+  \[
+     IMg(Q) = 500 - Q
+  \]
+
+  
+## Costes
+
+- El coste unitario es independiente de la producción:
+  \[
+    CMe(Q) = 200 
+  \]
+
+- El coste total es:
+  \[
+    C(Q) = 200 Q
+  \]
+
+- El coste marginal coincide con el coste unitario:
+  \[
+    CMg(Q) =  \frac{\mathrm{d}\; C(Q)}{\mathrm{d}\; Q} = 200
+  \]
+
+## Elección del nivel de producción
+
+- Condición de primer orden para la maximización del beneficio: 
+  \[ IMg(Q^*) = CMg(Q^*) \]
+- En nuestro caso:
+  \[
+     IMg(Q^*) = 500 - Q^* = 200 = CMg(Q^*)
+  \]
+
+- Por tanto
+  \[
+    Q^* = 300\ \text{u.}; \quad
+    P^* = 350\ \text{€/u.}; \quad
+    \pi^* = 45000\ \text{€}.
+  \]
+  
+## Estadísticos descriptivos
+
+```{r, echo = FALSE}
+kable(ddply (T2, .(Period), summQ), digits = 1)
+```
+
+
+## Distribución de las cantidades
+
+```{r, echo=FALSE}
+ggplot(T2, aes(Period, Quantity)) + 
+  geom_boxplot(fill="orange", alpha = 0.3)
+```
+
+## Distribución de las cantidades
+
+### Primer periodo 
+
+```{r, echo=FALSE}
+ggplot(filter(T2, Period == 1), 
+       aes(x = Quantity)) + 
+  geom_density(fill = "red", alpha = 0.3) 
+```
+
+## Distribución de las cantidades
+
+### Último periodo 
+
+```{r, echo=FALSE}
+ggplot(filter(T2, Period == 7), 
+       aes(x = Quantity, fill = Period)) + 
+  geom_density(fill = "blue", alpha = 0.3) 
+```
+
+
+## Distribución de las cantidades
+
+### Primer y último periodo 
+
+```{r, echo=FALSE}
+ggplot(filter(T2, Period == 1 | Period == 7), 
+       aes(x = Quantity, fill = Period)) + 
+  geom_density(alpha = 0.3) 
+```
+

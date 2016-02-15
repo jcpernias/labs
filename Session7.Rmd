@@ -1,0 +1,131 @@
+---
+title: "Séptima sesión de laboratorio"
+author: "José C. Pernías"
+date: "22/04/2015"
+output:
+  ioslides_presentation:
+    fig_height: 4.29
+    fig_width: 6
+    smaller: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.align='center', echo = FALSE)
+
+source("labdata.R")
+
+library(ggplot2)
+library(knitr)
+
+
+lab01 <- readSubjectsTables("LA01.xls")
+lab02 <- readSubjectsTables("LA02.xls")
+lab03 <- readSubjectsTables("LA03.xls")
+
+Ct1 <- rbind.fill (lab01$T1, lab02$T1, lab03$T1)
+
+Ct1 <- Ct1 %>% mutate(Period = as.factor(Period))
+
+```
+
+## Tratamiento 1
+
+* Dos empresas venden su producción en un mercado.
+* Cada empresa produce una variedad diferente de un mismo producto.
+* El coste de producción unitario de las dos empresas es de\ \(200\ €\).
+* Cada empresa decide simultáneamente la cantidad que produce y la demanda determina el precio al que se vende cada variedad.
+
+## Demanda
+
+- Curvas (inversas) de demanda de cada empresa:
+  \[\begin{gather*}
+    p_1 = 500 - \frac{1}{2} q_1 - \frac{1}{4} q_2 \\
+    p_2 = 500 - \frac{1}{4} q_1 - \frac{1}{2} q_2 
+    \end{gather*}
+  \]
+
+- Las demandas de las empresas son simétricas: obtenemos la curva de demanda de una de las empresas intercambiando los subíndices de la función de demanda de la otra empresa.
+
+- El sistema de demandas es el mismo que utilizamos en la sesión 5.
+
+
+## Ingresos
+- Ingresos de la empresa 1:
+  \[
+    I_1 = p_1 q_1 = 500 q_1 - \frac{1}{2} q^2_1 - \frac{1}{4} q_1 q_2
+  \]
+- Derivada de los ingresos con respecto del precio:
+  \[
+     IMg_1 = 500 - q_1 - \frac{1}{4} q_2
+  \]
+
+## Costes
+- Los costes de las dos empresas son idénticos:
+  \[
+    CMg_1 = CMg_2 = 200\ \text{€/u.}
+  \]
+
+## Maximización de los beneficios
+- Condición de primer orden para la maximización de beneficios:
+  \[
+     IMg_1 = 500 - q^*_1 - \frac{1}{4} q_2
+     = 200 = CMg_1  
+  \]
+
+- Función de reacción de la empresa 1:
+  \[
+      q^*_1 = 300 - \frac{1}{4} q_2
+  \]
+
+## Equilibrio de Nash
+
+- Cada empresa obtiene los mejores resultados posibles, dadas las estrategias que han seleccionado sus rivales.
+  \[\begin{gather*}
+      q^*_1 = 300 - \frac{1}{4} q^*_2 \\
+      q^*_2 = 300 - \frac{1}{4} q^*_1 \\
+    \end{gather*}
+  \]
+
+## Equilibrio
+
+- En equilibrio, cada empresa elige el mismo nivel de producción: 
+  \[ q^*_1 = q^*_2 = 240\ \text{u.} \]
+- Sustituyendo las cantidades en las funciones de demanda, se obtienen los precios a los que se vende cada variedad:
+  \[ p^*_1 = p^*_2 = 320\ \text{€/u.} \]
+- Beneficios:
+  \[ \pi^*_1 = \pi^*_2 = (300 - 200) 240 = 28\,800\ \text{€} \].
+  
+ 
+## Resultados del laboratorio
+
+- Sesiones del 21 de abril (grupo A).
+- Cada tratamiento estaba compuesto por 7 periodos.
+- Número de sujetos: `r NROW(Ct1)/7`.
+
+## Estadísticos descriptivos
+### Cantidades
+
+
+```{r}
+
+kable(ddply (Ct1, .(Period), summTable, "cantidad"),
+  digits = 1)      
+
+```
+
+
+
+## Distribución de las cantidades
+
+```{r}
+
+ggplot(Ct1, aes(Period, cantidad)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = 240, color = "DarkGreen", size = 1, alpha = 0.5) +
+  ylab("q") 
+
+```
+
+
+
+
