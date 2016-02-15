@@ -43,7 +43,7 @@ cummProf <- function(df) {
 ## Tratamiento 1
 
 * Una única empresa sirve el mercado de un producto.
-* Cada unidad vendida tiene un coste unitario de \(200\ €\).
+* Cada unidad vendida tiene un coste unitario de $200$ €.
 * La empresa elige a qué precio vende cada unidad de su producto.
 * Los consumidores deciden cuántas unidades compran a ese precio.
 
@@ -165,7 +165,7 @@ ggplot(filter(T1, Period == 1 | Period == 7),
 ## Tratamiento 2
 
 * Una única empresa sirve el mercado de un producto.
-* Cada unidad vendida tiene un coste unitario de \(200\ €\).
+* Cada unidad vendida tiene un coste unitario de $200$ €.
 * La empresa selecciona la cantidad que produce.
 * La demanda determina el precio al que se vende cada unidad.
 
