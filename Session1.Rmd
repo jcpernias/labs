@@ -23,7 +23,8 @@ lab03 <- readSubjectsTables("./data/160216_1202.xls")
 T1 <- rbind.fill(lab01$T1 %>% mutate(Lab = 1), 
                  lab02$T1 %>% mutate(Lab = 2), 
                  lab03$T1 %>% mutate(Lab = 3)) %>%
-    mutate(Period = as.factor(Period), Subject = as.factor(100 * Lab + Subject), Lab = as.factor(Lab),  
+    mutate(Period = as.factor(Period), 
+           Subject = as.factor(100 * Lab + Subject), Lab = as.factor(Lab),  
            Price = precio, Quantity = cantidad) %>%
   select(Period, Lab, Subject, Price, Quantity, Profit) %>%
   filter(Price < 500)
