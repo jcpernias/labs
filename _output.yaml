@@ -1,4 +1,6 @@
 ioslides_presentation:
+  mathjax: default
   fig_height: 4.29
   fig_width: 6
   smaller: yes
+  css: labdata.css
