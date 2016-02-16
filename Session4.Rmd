@@ -2,11 +2,6 @@
 title: "Cuarta sesión de laboratorio"
 author: "José C. Pernías"
 date: "15/03/2015"
-output:
-  ioslides_presentation:
-    fig_height: 4.29
-    fig_width: 6
-    smaller: yes
 ---
 
 ```{r, include=FALSE}
