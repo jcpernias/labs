@@ -1,21 +1,40 @@
 ---
 title: "Primera sesión de laboratorio"
 author: "José C. Pernías"
-date: "08/02/2015"
+date: "16/02/2016"
 ---
 
 ```{r, include=FALSE}
-library(plyr)
-library(dplyr)
+
+knitr::opts_chunk$set(fig.align='center', echo = FALSE)
+
+library(MASS)
+
+source("./R/labdata.R")
+
 library(ggplot2)
 library(knitr)
 
-load("ses1.RData")
+lab01 <- readSubjectsTables("./data/160216_0920.xls") 
+lab02 <- readSubjectsTables("./data/160216_1033.xls")
+lab03 <- readSubjectsTables("./data/160216_1202.xls")
 
 
-
-T1 <- filter(ses1, Treatment == 1)
-T2 <- filter(ses1, Treatment == 2)
+T1 <- rbind.fill(lab01$T1 %>% mutate(Lab = 1), 
+                 lab02$T1 %>% mutate(Lab = 2), 
+                 lab03$T1 %>% mutate(Lab = 3)) %>%
+    mutate(Period = as.factor(Period), Subject = as.factor(100 * Lab + Subject), Lab = as.factor(Lab),  
+           Price = precio, Quantity = cantidad) %>%
+  select(Period, Lab, Subject, Price, Quantity, Profit) %>%
+  filter(Price < 500)
+  
+T2 <- rbind.fill(lab01$T2 %>% mutate(Lab = 1), 
+                 lab02$T2 %>% mutate(Lab = 2), 
+                 lab03$T2 %>% mutate(Lab = 3)) %>%
+    mutate(Period = as.factor(Period), Subject = as.factor(100 * Lab + Subject), Lab = as.factor(Lab),  
+           Price = precio, Quantity = cantidad) %>%
+  select(Period, Lab, Subject, Price, Quantity, Profit) %>%
+  filter(Price < 500)
 
 labels <- c("Mean", "SD", "Min.", "  25%", "Median", "  75%", "Max.")
 
@@ -101,7 +120,7 @@ cummProf <- function(df) {
    \frac{\mathrm{d}\; \pi(P)}{\mathrm{d}\; P} = 1400 - 4 P
   \]
 - Por tanto
-  \[
+  \[\def\euro{\unicode[.7,0]{x204C}}
     P^* = 350\ \text{€/u.}; \quad
     Q^* = 300\ \text{u.}; \quad
     \pi^* = 45000\ \text{€}.
@@ -110,9 +129,9 @@ cummProf <- function(df) {
 
 ## Resultados del laboratorio
 
-- Sesiones del 2 de febrero (grupo F) y 3 de febrero (grupo A) de 2015.
-- Cada tratamiento estaba compuesto por 7 periodos.
-- Número de sujetos: ```r length (unique(ses1$Subject))```
+- Sesiones del 16 de febrero de 2016.
+- Cada tratamiento estaba compuesto por 10 periodos.
+- Número de sujetos: ```r length (unique(T1$Subject))```
 
 ## Estadísticos descriptivos
 
@@ -135,7 +154,7 @@ ggplot(T1, aes(Period, Price)) +
 
 ```{r, echo=FALSE}
 ggplot(filter(T1, Period == 1), 
-       aes(x = Price)) + 
+       aes(x = Price)) + xlim(200, 500) + 
   geom_density(fill = "red", alpha = 0.3) 
 ```
 
@@ -146,7 +165,7 @@ ggplot(filter(T1, Period == 1),
 
 ```{r, echo=FALSE}
 ggplot(filter(T1, Period == 7), 
-       aes(x = Price, fill = Period)) + 
+       aes(x = Price, fill = Period)) + xlim(200, 500) + 
   geom_density(fill = "blue", alpha = 0.3) 
 ```
 
@@ -157,7 +176,7 @@ ggplot(filter(T1, Period == 7),
 
 ```{r, echo=FALSE}
 ggplot(filter(T1, Period == 1 | Period == 7), 
-       aes(x = Price, fill = Period)) + 
+       aes(x = Price, fill = Period)) + xlim(200, 500) + 
   geom_density(alpha = 0.3) 
 ```
 
@@ -239,7 +258,7 @@ ggplot(T2, aes(Period, Quantity)) +
 
 ```{r, echo=FALSE}
 ggplot(filter(T2, Period == 1), 
-       aes(x = Quantity)) + 
+       aes(x = Quantity)) + xlim(100, 500) + 
   geom_density(fill = "red", alpha = 0.3) 
 ```
 
@@ -249,7 +268,7 @@ ggplot(filter(T2, Period == 1),
 
 ```{r, echo=FALSE}
 ggplot(filter(T2, Period == 7), 
-       aes(x = Quantity, fill = Period)) + 
+       aes(x = Quantity, fill = Period)) + xlim(100, 500) + 
   geom_density(fill = "blue", alpha = 0.3) 
 ```
 
@@ -260,7 +279,7 @@ ggplot(filter(T2, Period == 7),
 
 ```{r, echo=FALSE}
 ggplot(filter(T2, Period == 1 | Period == 7), 
-       aes(x = Quantity, fill = Period)) + 
+       aes(x = Quantity, fill = Period)) + xlim(100, 500) + 
   geom_density(alpha = 0.3) 
 ```
 
