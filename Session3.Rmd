@@ -15,6 +15,42 @@ library(ggplot2)
 library(knitr)
 
 
+
+## Cournot
+## Mercado y matching definen las dos empresas de cada mercado
+T2 <- rbind.fill(lab01$T2 %>% mutate(Lab = 1), 
+                 lab02$T2 %>% mutate(Lab = 2), 
+                 lab03$T2 %>% mutate(Lab = 3)) %>% 
+  mutate(Period = as.factor(Period), 
+         Subject = as.factor(100 * Lab + Subject), Lab = as.factor(Lab),  
+         Price = precio, Quantity = cantidad, 
+         OtherQuantity = otracantidad,
+         MarketQuantity = cantidad + otracantidad,
+         MarketID = factor(10 * mercado + matching)) %>%
+  select(Period, Lab, Subject, MarketID, 
+         Quantity, OtherQuantity, MarketQuantity, Price, Profit)
+
+
+
+# St.lead <- filter(St, type == 1)
+# St.foll <- filter(St, type == 2)
+# 
+# St.dQ <- select(St.lead, Period, cantidad, otracantidad) %>%
+#   mutate(dQ = cantidad - otracantidad, dQpos = dQ > 0, 
+#          dQeq = dQ == 0, dQneg = dQ < 0)
+
+## Dispersion plot showing response of followers to the leaders stratetegies.
+## Points of different periods in different colors
+
+# ddply(st.dQ, .(Period), summTable, "dQ")
+# ddply(st.dQ, .(Period), function (df) colSums (select(df, dQpos, dQeq, dQneg)))
+# 
+# 
+# 
+# ddply (Co, .(Period), summTable, "cantidad")
+
+
+
 lab01 <- readSubjectsTables("LA01.xls")
 lab02 <- readSubjectsTables("LA02.xls")
 lab03 <- readSubjectsTables("LA03.xls")
@@ -42,244 +78,68 @@ Co.dQ <- select(Co.low, Period, cantidad, otracantidad) %>%
 
 
 
+
 ```
 
 ## Tratamiento 1
 
 * Dos empresas sirven el mercado de un producto homogéneo.
-* Cada periodo se divide en dos etapas:
-    - La empresa líder decide cuántas unidades va a producir.
-    - La empresa seguidora decide su producción _conociendo la decisión de la líder_.
-* El coste de producción unitario de la empresa líder es de\ \(200\ €\), mientras que el de la empresa seguidora es \(290\ €\).
+* Cada unidad producida tiene un coste unitario de $200$ €.
+* Cada periodo las empresas deciden simultáneamente cuántas unidades va a producir.
 * La demanda determina el precio al que se venden todas las unidades.
 
-## Costes
+## La elección del nivel de producción
 
-- El coste unitario es independiente de la producción:
+- Funciones de reacción:
   \[
-    CMe_1(q_1) = 200; \qquad CMe_2(q_2) = 290 
+    \begin{gather*}
+      q_1^* = 300 - \frac{q_2}{2} \\
+      q_2^* = 300 - \frac{q_1}{2}
+    \end{gather*}
   \]
+- La primera ecuación expresa la producción que maximiza los beneficios de la empresa 1 _si la empresa 2 produce $q_2$_.
+- La segunda ecuación expresa la producción que maximiza los beneficios de la empresa 2 _si la empresa 1 produce $q_1$_.
 
-- Los costes de cada una de las empresas son:
+## Equilibrio de Nash
+
+- En equilibrio la producción de cada una de las empresas es la mejor respuesta a las decisiones de producción de sus rivales.
   \[
-    C_1(q_1) = 200 q_1; \qquad C_2(q_2) = 290 q_2
+    \begin{gather*}
+      q_1^* = 300 - \frac{q^*_2}{2} \\
+      q_2^* = 300 - \frac{q^*_1}{2}
+    \end{gather*}
   \]
-
-- El coste marginal coincide con el coste unitario:
-  \[
-    CMg_1(q_1) =  \frac{\mathrm{d}\; C_1(q_1)}{\mathrm{d}\; q_1} = 200; \quad 
-    CMg_2(q_2) = 290
-  \]
-
-
-## Demanda
-
-- La curva inversa de demanda del mercado es:
-  \[
-     P = 500 - \frac{1}{2} Q
-  \]
-
-- La producción total, $Q$, es la suma de las producciones de cada empresa:
-  \[
-    Q = q_1 + q_2
-  \]
-
-- Por tanto:
-  \[
-     P = 500 - \frac{1}{2} (q_1 + q_2)
-  \]
-
-## Ingresos
-
-- Los ingresos de la empresa $2$ son:
-  \[
-     I_2(q_2) = P q_2
-  \]
-
-- Sustituyendo la curva de demanda en la expresión anterior:
-  \[
-    I_2(q_2) = \Big(500 - \frac{q_1}{2}  - \frac{q_2}{2}\Big) q_2
-  \]
-
-- Ingreso marginal de la empresa 2:
-  \[
-     IMg_2(q_2) = \frac{\mathrm{d}\; I_2(q_2)}{\mathrm{d}\; q_2} = 
-     500 - \frac{q_1}{2}  - q_2
-  \]
-
-
-## Producción del seguidor
-
-- Condición de primer orden para la maximización del beneficio: 
-  \[ IMg_2(q_2^*) = CMg_2(q_2^*) \]
-- En nuestro caso:
-  \[
-     500 - \frac{q_1}{2}  - q_2^* = 290
-  \]
-
-- Función de reacción del seguidor:
-  \[
-      q_2^* = 210 - \frac{q_1}{2} 
-  \]
-
-
-## Ingresos del líder
-- Sustituimos la reacción del seguidor en la curva de demanda:
-  \[
-     P = 500 -\frac{1}{2}(q_1 + 210 - \frac{1}{2} q_1) = 395 -\frac{1}{4} q_1
-  \]
-- Los ingresos del líder son:
-  \[
-     I_1(q_1) = P q_1 = 395 q_1 - \frac{1}{4} q_1^2
-  \]
-
-- Ingreso marginal de la empresa 1:
-  \[
-     IMg_1(q_1) = \frac{\mathrm{d}\; I_1(q_1)}{\mathrm{d}\; q_1} = 
-     395 - \frac{1}{2} q_1
-  \]
-
-## Producción del líder
-
-- Condición de primer orden para la maximización del beneficio: 
-  \[ IMg_1(q_1^*) = CMg_1(q_1^*) \]
-
-- En nuestro caso:
-  \[
-     395 - \frac{q_1^*}{2} = 200
-  \]
-
-- Por tanto:
-  \[
-      q_1^* = 390\ \text{u.} 
-  \]
-
-## Equilibrio: producción
-
-- El líder produce $q^*_1 = 390$ unidades.
-- La reacción óptima del seguidor es: 
-  \[ 
-    q^*_2 = 210 - q^*_1 /2 = 15\ \text{unidades.}
-  \]
-- La producción de mercado es 
-  \[
-   Q^* = q^*_1 + q^*_2 = 390 + 15 = 405\ \text{unidades.}
-  \]
-
-
-## Equilibrio: precios y beneficios
-
-- La demanda determina el precio: 
-  \[
-    P^* = 500 - Q^*/2 = 500 - 405/2 = 297{,}5 \ \text{€/u.}
-  \]
-- El beneficio del líder es 
-  \[
-  \pi_1 = (P^* - CMe) q^*_1 = (297{,}5 - 200) \times 390 = 38025\ \text{€}.
-  \]
-- El beneficio del líder es 
-  \[
-  \pi_2 = (P^* - CMe) q^*_2 = (297{,}5 - 290) \times 15 = 112{,}5\ \text{€}.
-  \]
+- En equilibrio $q^*_1 = q^*_2 = 200$ unidades.
+- El precio de equilibrio es $P^* = 500 - 400/2 = 300$ €/u.
+- Los beneficios son $\pi^*_1 = \pi^*_2 = 20000$ €.  
   
   
-## Resultados del laboratorio
-
-- Sesiones del 23 de febrero (grupo F) y 24 de febrero (grupo A) de 2015.
-- Cada tratamiento estaba compuesto por 7 periodos.
-- Número de sujetos: `r NROW(Co)/7`.
-
 ## Estadísticos descriptivos
-### Producción del líder
 
-
+### Producción de las empresas
 ```{r}
 
-kable(ddply (St.lead, .(Period), summTable, "cantidad"),
+kable(ddply (T2, .(Period), summTable, "Quantity"),
   digits = 1)      
 
 ```
 
 
-## Estadísticos descriptivos
-### Producción del seguidor
 
 
+## Distribución de las cantidades
+
+### Producción de las empresas
 ```{r}
 
-kable(ddply (St.foll, .(Period), summTable, "cantidad"),
-  digits = 1)      
-
-```
-
-## Distribución de la producción
-### Empresa líder
-
-```{r}
-
-ggplot(St.lead, aes(Period, cantidad)) + 
+ggplot(T2, aes(Period, Quantity)) + 
   geom_boxplot(fill="orange", alpha = 0.3) +
-  geom_hline(yintercept = 390, color = "DarkGreen", size = 1, alpha = 0.5) +
-  ylab("q1") 
-
-```
-
-## Distribución de la producción
-### Empresa seguidora
-
-```{r}
-
-ggplot(St.foll, aes(Period, cantidad)) + 
-  geom_boxplot(fill="orange", alpha = 0.3) +
-  geom_hline(yintercept = 15, color = "DarkGreen", size = 1, alpha = 0.5) +
-  ylab("q2") 
-
-```
-
-## Comparación de las cantidades
-### Diferencia de las producciones del líder y del seguidor
-
-```{r}
-
-ggplot(St.dQ, aes(Period, dQ)) + 
-  geom_boxplot(fill="orange", alpha = 0.3) +
-  geom_hline(yintercept = 375, color = "DarkGreen", size = 1, alpha = 0.5) +
-  ylab("q1 - q2") 
-
-```
-
-
-## Comparación de las cantidades
-### Producciones del líder y del seguidor
-
-```{r}
-ggplot(St.dQ, aes(cantidad, otracantidad)) + 
-  geom_point() + geom_line(stat="smooth", method="lm", se = FALSE, 
-                           color = "DarkBlue", alpha = 0.2) + 
-  geom_segment(x = 0, y = 210, xend = 410, yend = 0, 
-               color = "DarkGreen", size = 0.75, alpha = 0.2) +
-  ylab("q2") + xlab("q1")
-  
-
-```
-
-  
-
-
-## Comparación de las cantidades
-### Correlación de las producciones por período 
-
-```{r}
-St.cor <- ddply(St.dQ, .(Period), function(df) {
-  c(rho = with(df, cor(cantidad, otracantidad)))
-})
-
-kable(St.cor, digits = 2)
+  geom_hline(yintercept = 200, color = "DarkGreen", size = 1, alpha = 0.5) +
+  ylab("q")
 ```
 
 
 
-  
 
 
 ## Tratamiento 2
