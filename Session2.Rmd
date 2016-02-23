@@ -15,9 +15,9 @@ library(ggplot2)
 library(knitr)
 
 
-lab01 <- readSubjectsTables("./data/LA01.xls")
-lab02 <- readSubjectsTables("./data/LA02.xls")
-lab03 <- readSubjectsTables("./data/LA03.xls")
+lab01 <- readSubjectsTables("./data/160223_0903.xls")
+lab02 <- readSubjectsTables("./data/160223_1108.xls")
+lab03 <- readSubjectsTables("./data/160223_1220.xls")
 
 
 ## Stackelberg
@@ -411,7 +411,7 @@ kable(T1_cor, digits = 2)
 
 - En nuestro caso:
   \[
-     395 - \frac{q_1^*}{2} = 200
+     395 - \frac{1}{2}q_1^* = 200
   \]
 
 - Por tanto:
