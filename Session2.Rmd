@@ -390,7 +390,7 @@ kable(T1_cor, digits = 2)
 
 - Sustituimos la reacción del seguidor en la curva de demanda:
   \[
-     P(q_1) = P(q_1, q^*2(q_1)) = 500 -\frac{1}{2}(q_1 + 210 - \frac{1}{2} q_1) = 395 -\frac{1}{4} q_1
+     P(q_1) = P(q_1, q^*_2(q_1)) = 500 -\frac{1}{2}(q_1 + 210 - \frac{1}{2} q_1) = 395 -\frac{1}{4} q_1
   \]
 
 - Los ingresos del líder son:
