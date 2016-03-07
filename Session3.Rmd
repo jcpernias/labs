@@ -16,13 +16,18 @@ library(knitr)
 
 
 labs_files <- c("./data/LA01c.xls", "./data/LA01c.xls", "./data/LA01c.xls")
+labs_files <- c("./data/LA01c.xls")
 
 dflabs <- setNames(llply(labs_files, readSubjectsTables),
                    paste("Lab", seq_along(labs_files), sep=""))
 
+dflabs <- llply(labs_files, readSubjectsTables)
+
 extract_treat <- function(dflist, treat) {
-  bind_rows(laply(dflist, function(df) df[treat]), .id="Lab")
+  bind_rows(llply(dflist, function(df) df[[treat]]), .id="Lab")
 }
+
+T1 <- extract_treat(dflabs, "T1")
 
 T1 <- extract_treat(dflabs, "T1") %>% 
   mutate(Period = as.factor(Period), 
@@ -302,7 +307,7 @@ ggplot(T1, aes(Period, Quantity)) +
   \]
 - En equilibrio $q^*_1 = 260$ y  $q^*_2 = 80$ unidades.
 - El precio de equilibrio es $P^* = 500 - 340/2 = 330$ €/u.
-- Los beneficios son $\pi^*_1 = 33800$ y $\pi^*_2 = 3200$ €.  
+- Los beneficios son $\pi^*_1 = 33\,800$ y $\pi^*_2 = 3200$ €.  
   
 
 ## Estadísticos descriptivos
