@@ -60,10 +60,87 @@ T2_high <- T2 %>% filter(Type == 2)
 
 * Dos empresas sirven el mercado de un producto homogéneo.
 * Cada unidad producida tiene un coste unitario de $200$ €.
-* Cada periodo las empresas deciden simultáneamente cuántas unidades va a producir.
+* Cada periodo las empresas deciden simultánea e independientemente cuántas unidades van a producir.
 * La demanda determina el precio al que se venden todas las unidades.
 
-## La elección del nivel de producción
+## Costes
+
+- El coste unitario es independiente de la producción:
+  \[
+    CMe_1(q_1) = CMe_2(q_2) = 200 
+  \]
+
+- Los costes de cada una de las empresas son:
+  \[
+    C_1(q_1) = 200 q_1; \qquad C_2(q_2) = 200 q_2
+  \]
+
+- El coste marginal coincide con el coste unitario:
+  \[
+    CMg_1(q_1) =  \frac{\mathrm{d}\; C_1(q_1)}{\mathrm{d}\; q_1} = 200; \quad 
+    CMg_2(q_2) = 200
+  \]
+
+
+## Demanda
+
+- La curva inversa de demanda del mercado es:
+  \[
+     P = 500 - \frac{1}{2} Q
+  \]
+
+- La producción total, $Q$, es la suma de las producciones de cada empresa:
+  \[
+    Q = q_1 + q_2
+  \]
+
+- Por tanto:
+  \[
+     P(q_1, q_2) = 500 - \frac{1}{2} (q_1 + q_2)
+  \]
+
+## Ingresos
+
+- Los ingresos de la empresa 1 son:
+  \[
+     I_1(q_1, q_2) = P(q_1, q_2) q_1
+  \]
+
+- Sustituyendo la curva de demanda en la expresión anterior:
+  \[
+    I_1(q_1, q_2) = \Big(500 - \frac{1}{2}q_1  - \frac{1}{2}q_2\Big) q_1
+  \]
+
+- Ingreso marginal de la empresa 1:
+  \[
+     IMg_1(q_1, q_2) = \frac{\mathrm{d}\; I_1(q_1, q_2)}{\mathrm{d}\; q_1} = 
+     500 - \frac{1}{2}q_2  - q_1
+  \]
+
+
+## Condición de primer orden
+
+- Condición de primer orden para la maximización del beneficio: 
+  \[ IMg_1(q_1^*, q_2) = CMg_1(q_1^*) \]
+
+- En nuestro caso:
+  \[
+     500 - \frac{1}{2}q_2  - q_1^* = 200
+  \]
+
+- Función de reacción de la empresa 1:
+  \[
+      q_1^*(q_2) = 300 - \frac{1}{2} q_2 
+  \]
+
+- Las dos empresas son idénticas. Función de reacción de la empresa 2:
+  \[
+      q_2^*(q_1) = 300 - \frac{1}{2} q_1 
+  \]
+
+
+
+## Funciones de reacción
 
 - Funciones de reacción:
   \[
@@ -86,8 +163,17 @@ T2_high <- T2 %>% filter(Type == 2)
   \]
 - En equilibrio $q^*_1 = q^*_2 = 200$ unidades.
 - El precio de equilibrio es $P^* = 500 - 400/2 = 300$ €/u.
-- Los beneficios son $\pi^*_1 = \pi^*_2 = 20000$ €.  
+- Los beneficios son $\pi^*_1 = \pi^*_2 = 20\,000$ €.  
   
+
+## Resultados del laboratorio
+
+- Sesiones del 8 de marzo de 2016.
+
+- Cada tratamiento estaba compuesto por `r length(levels(T1$Period))` periodos.
+
+- Número de sujetos: `r length(levels(T1$Subject))`.
+
   
 ## Estadísticos descriptivos
 
@@ -116,10 +202,84 @@ ggplot(T1, aes(Period, Quantity)) +
 
 * Dos empresas sirven el mercado de un producto homogéneo.
 * El coste unitario de la empresa 1 es de \(200\ €\) mientras que el de la empresa 2 es de \(290\ €\).
-* Cada periodo las empresas deciden simultáneamente cuántas unidades va a producir.
+* Cada periodo las empresas deciden simultánea e independientemente cuántas unidades van a producir.
 * La demanda determina el precio al que se venden todas las unidades.
 
-## La elección del nivel de producción
+## Costes
+
+- El coste unitario es independiente de la producción:
+  \[
+    CMe_1(q_1) = 200; \qquad CMe_2(q_2) = 290 
+  \]
+
+- Los costes de cada una de las empresas son:
+  \[
+    C_1(q_1) = 200 q_1; \qquad C_2(q_2) = 290 q_2
+  \]
+
+- El coste marginal coincide con el coste unitario:
+  \[
+    CMg_1(q_1) = 200; \quad CMg_2(q_2) = 290
+  \]
+
+
+## Demanda
+
+- La curva inversa de demanda del mercado es:
+  \[
+     P = 500 - \frac{1}{2} Q
+  \]
+
+- La producción total, $Q$, es la suma de las producciones de cada empresa:
+  \[
+    Q = q_1 + q_2
+  \]
+
+- Por tanto:
+  \[
+     P(q_1, q_2) = 500 - \frac{1}{2} (q_1 + q_2)
+  \]
+
+## Ingresos
+
+- Los ingresos de la empresa 2 son:
+  \[
+     I_2(q_1, q_2) = P(q_1, q_2) q_2
+  \]
+
+- Sustituyendo la curva de demanda en la expresión anterior:
+  \[
+    I_2(q_1, q_2) = \Big(500 - \frac{1}{2}q_1  - \frac{1}{2} q_2\Big) q_2
+  \]
+
+- Ingreso marginal de la empresa 2:
+  \[
+     IMg_2(q_2) = \frac{\mathrm{d}\; I_2(q_2)}{\mathrm{d}\; q_2} = 
+     500 - \frac{1}{2} q_1  - q_2
+  \]
+
+## Condición de primer orden
+
+- Condición de primer orden para la maximización del beneficio: 
+  \[ IMg_2(q_1, q_2^*) = CMg_2(q_2^*) \]
+
+- En nuestro caso:
+  \[
+     500 - \frac{1}{2}q_1  - q_2^* = 290
+  \]
+
+- Función de reacción de la empresa 1:
+  \[
+      q_2^*(q_1) = 210 - \frac{1}{2} q_1 
+  \]
+
+- La función de reacción de la empreas 1 es la misma que en el Tratamiento 1:
+  \[
+      q_1^*(q_2) = 300 - \frac{1}{2} q_2 
+  \]
+
+
+## Funciones de reacción
 
 - Funciones de reacción:
   \[
