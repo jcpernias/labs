@@ -1,7 +1,7 @@
 ---
 title: "Tercera sesión de laboratorio"
 author: "José C. Pernías"
-date: "08/03/2016"
+date: "15/03/2016"
 ---
 
 ```{r, include=FALSE}
@@ -15,8 +15,7 @@ library(ggplot2)
 library(knitr)
 
 
-labs_files <- c("./data/LA01c.xls", "./data/LA01c.xls", "./data/LA01c.xls")
-labs_files <- c("./data/LA01c.xls")
+labs_files <- paste("./data/160315_", c("0924", "1032", "1158"), ".xls", sep = "")
 
 dflabs <- setNames(llply(labs_files, readSubjectsTables),
                    paste("Lab", seq_along(labs_files), sep=""))
@@ -173,7 +172,7 @@ T2_high <- T2 %>% filter(Type == 2)
 
 ## Resultados del laboratorio
 
-- Sesiones del 8 de marzo de 2016.
+- Sesiones del 15 de marzo de 2016.
 
 - Cada tratamiento estaba compuesto por `r length(levels(T1$Period))` periodos.
 
