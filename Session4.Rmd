@@ -14,8 +14,7 @@ source("R/labdata.R")
 library(ggplot2)
 library(knitr)
 
-labs_files <- paste("./data/160322_", c("0900"), ".xls", sep = "")
-labs_files <- paste("./data/160322_", c("0900"), ".xls", sep = "")
+labs_files <- paste("./data/160322_", c("0900", "1018", "1152"), ".xls", sep = "")
 
 dflabs <- llply(labs_files, readSubjectsTables)
 
