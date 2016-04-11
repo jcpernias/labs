@@ -1,55 +1,55 @@
 ---
-title: "Sexta sesión de laboratorio"
+title: "Quinta sesión de laboratorio"
 author: "José C. Pernías"
-date: "17/04/2015"
+date: "05/04/2016"
 ---
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(fig.align='center', echo = FALSE)
 
-source("labdata.R")
+source("./R/labdata.R")
 
 library(ggplot2)
 library(knitr)
 
 
-addLab <- function(df, lab) {
-  df$lab <- lab
-  df  
+labs_files <- paste("./data/160405_", c("0904", "1023", "1155"), ".xls", sep = "")
+
+dflabs <- llply(labs_files, readSubjectsTables)
+
+extract_treat <- function(dflist, treat) {
+  bind_rows(llply(dflist, function(df) df[[treat]]), .id="Lab")
 }
 
-lab01 <- readSubjectsTables("LA01.xls")
-lab01 <- llply(lab01, addLab, 1)
-lab02 <- readSubjectsTables("LA02.xls")
-lab02 <- llply(lab02, addLab, 2)
-lab03 <- readSubjectsTables("LA03.xls")
-lab03 <- llply(lab03, addLab, 3)
+T1 <- extract_treat(dflabs, "T1") %>% 
+  mutate(Period = as.factor(Period), 
+         Subject = as.factor(100 * as.integer(Lab) + Subject), 
+         Lab = as.factor(Lab),
+         Quantity = cantidad, 
+         MarketID = factor(10 * mercado + matching)) %>%
+  select(Period, Lab, Subject, MarketID, Quantity)
 
-T1 <- rbind.fill(lab01$T1, lab02$T1, lab03$T1) %>%
-  mutate(Lab = as.factor(lab), Period = as.factor(Period), 
-         Subject = as.factor(lab * 100 + Subject),
-         Market = as.factor((matching - 1)* 2 + mercado),
-         qi = cantidad, Qi = otracantidad) %>%
-  select(Lab, Treatment, Period, Subject, Market, qi, Qi)
+T2 <- extract_treat(dflabs, "T2") %>% 
+  mutate(Period = as.factor(Period), 
+         Subject = as.factor(100 * as.integer(Lab) + Subject), 
+         Lab = as.factor(Lab),
+         Quantity = cantidad, 
+         MarketID = factor(10 * mercado + matching)) %>%
+  select(Period, Lab, Subject, MarketID, Quantity)
 
-T2 <- rbind.fill(lab01$T2, lab02$T2, lab03$T2) %>%
-  mutate(Lab = as.factor(lab), Period = as.factor(Period), 
-         Subject = as.factor(lab * 100 + Subject),
-         Market = as.factor((matching - 1)* 2 + mercado),
-         qi = cantidad, Qi = otracantidad) %>%
-  select(Lab, Treatment, Period, Subject, Market, qi, Qi)
 
-T3 <- rbind.fill(lab01$T3, lab02$T3, lab03$T3) %>%
-  mutate(Lab = as.factor(lab), Period = as.factor(Period), 
-         Subject = as.factor(lab * 100 + Subject),
-         Market = as.factor((matching - 1)* 2 + mercado),
-         qi = cantidad, Qi = otracantidad) %>%
-  select(Lab, Treatment, Period, Subject, Market, qi, Qi) %>%
-  filter(Lab != 2 | Period %in% 1:5 | qi > 0)
+T3 <- extract_treat(dflabs, "T3") %>% 
+  mutate(Period = as.factor(Period), 
+         Subject = as.factor(100 * as.integer(Lab) + Subject), 
+         Lab = as.factor(Lab),
+         Quantity = cantidad, 
+         MarketID = factor(10 * mercado + matching)) %>%
+  select(Period, Lab, Subject, MarketID, Quantity)
 
-q1 <- T1 %>% select(Period, Subject, qT1 = qi)
-q2 <- T2 %>% select(Period, Subject, qT2 = qi)
-q3 <- T3 %>% select(Period, Subject, qT3 = qi)
+
+q1 <- T1 %>% select(Period, Subject, qT1 = Quantity)
+q2 <- T2 %>% select(Period, Subject, qT2 = Quantity)
+q3 <- T3 %>% select(Period, Subject, qT3 = Quantity)
 
 qall <- q1 %>% right_join(q2) %>% right_join(q3) %>%
   mutate(dT2 = qT2 - qT1, dT3 = qT3 - qT1)
@@ -126,9 +126,9 @@ qall <- q1 %>% right_join(q2) %>% right_join(q3) %>%
  
 ## Resultados del laboratorio
 
-- Sesiones del 14 de abril (grupo A) de 2015.
-- Cada tratamiento estaba compuesto por 7 periodos.
-- Número de sujetos: `r NROW(T1)/7`.
+- Sesiones del 5 de abril de 2016.
+- Cada tratamiento estaba compuesto por `r length(levels(T1$Period))` periodos.
+- Número de sujetos:  `r length(levels(T1$Subject))`.
 
 ## Estadísticos descriptivos
 ### Tratamiento 1: Producción
@@ -136,7 +136,7 @@ qall <- q1 %>% right_join(q2) %>% right_join(q3) %>%
 
 ```{r}
 
-kable(ddply (T1, .(Period), summTable, "qi"),
+kable(ddply (T1, .(Period), summTable, "Quantity"),
       digits = 1)      
 ```
 
@@ -145,7 +145,7 @@ kable(ddply (T1, .(Period), summTable, "qi"),
 
 ```{r}
 
-ggplot(T1, aes(Period, qi)) + 
+ggplot(T1, aes(Period, Quantity)) + 
   geom_boxplot(fill="orange", alpha = 0.3) +
   geom_hline(yintercept = 120, color = "DarkGreen", size = 1, alpha = 0.5) +
   ylab(expression(q[i])) 
@@ -156,7 +156,7 @@ ggplot(T1, aes(Period, qi)) +
 
 * En estos tratamientos se añaden características que pueden facilitar la colusión entre las empresas de cada mercado:
     - __Tratamiento 2__: En todos los períodos, cada mercado está formado por las mismas cuatro empresas.
-    - __Tratamiento 3__: Los mercados no cambian a lo largo de los siete períodos y las empresas se pueden comunicar entre sí.
+    - __Tratamiento 3__: Los mercados no cambian y las empresas se pueden comunicar entre sí.
 
 
 ## Colusión
@@ -244,7 +244,7 @@ ggplot(T1, aes(Period, qi)) +
 
 ```{r}
 
-kable(ddply (T2, .(Period), summTable, "qi"),
+kable(ddply (T2, .(Period), summTable, "Quantity"),
       digits = 1)      
 
 ```
@@ -255,7 +255,7 @@ kable(ddply (T2, .(Period), summTable, "qi"),
 
 ```{r}
 
-ggplot(T2, aes(Period, qi)) + 
+ggplot(T2, aes(Period, Quantity)) + 
   geom_boxplot(fill="orange", alpha = 0.3) +
   geom_hline(yintercept = 120, color = "DarkGreen", size = 1, alpha = 0.5) +
   geom_hline(yintercept = 75, color = "DarkRed", size = 1, alpha = 0.5) +
@@ -269,7 +269,7 @@ ggplot(T2, aes(Period, qi)) +
 
 ```{r}
 
-kable(ddply (T3, .(Period), summTable, "qi"),
+kable(ddply (T3, .(Period), summTable, "Quantity"),
       digits = 1)      
 
 ```
@@ -279,7 +279,7 @@ kable(ddply (T3, .(Period), summTable, "qi"),
 
 ```{r}
 
-ggplot(T3, aes(Period, qi)) + 
+ggplot(T3, aes(Period, Quantity)) + 
   geom_boxplot(fill="orange", alpha = 0.3) +
   geom_hline(yintercept = 120, color = "DarkGreen", size = 1, alpha = 0.5) +
   geom_hline(yintercept = 75, color = "DarkRed", size = 1, alpha = 0.5) +
