@@ -1,7 +1,7 @@
 ---
-title: "Quinta sesión de laboratorio"
+title: "Sexta sesión de laboratorio"
 author: "José C. Pernías"
-date: "13/04/2015"
+date: "12/04/2016"
 ---
 
 ```{r, include=FALSE}
@@ -9,21 +9,49 @@ knitr::opts_chunk$set(fig.align='center', echo = FALSE)
 
 library(MASS)
 
-source("labdata.R")
+source("./R/labdata.R")
 
 library(ggplot2)
 library(knitr)
 
+labs_files <- paste("./data/160412_", c("0903", "1017", "1141"), ".xls", sep = "")
 
-lab01 <- readSubjectsTables("LA01.xls")
-lab02 <- readSubjectsTables("LA02.xls")
-lab03 <- readSubjectsTables("LA03.xls")
-lab16 <- readSubjectsTables("LA16.xls")
-lab17 <- readSubjectsTables("LA17.xls")
+dflabs <- llply(labs_files, readSubjectsTables)
 
-Bt1 <- rbind.fill (lab01$T1, lab02$T1, lab03$T1, lab16$T1, lab17$T1)
+extract_treat <- function(dflist, treat) {
+  bind_rows(llply(dflist, function(df) df[[treat]]), .id="Lab")
+}
 
-Bt1 <- Bt1 %>% mutate(Period = as.factor(Period))
+T1 <- extract_treat(dflabs, "T1") %>% 
+  mutate(Period = as.factor(Period), 
+         Subject = as.factor(100 * as.integer(Lab) + Subject), 
+         Lab = as.factor(Lab),
+         Quantity = cantidad,
+         Price = precio,
+         MarketID = factor(10 * mercado + matching)) %>%
+  select(Period, Lab, Subject, MarketID, Quantity, Price)
+
+T2 <- extract_treat(dflabs, "T2") %>% 
+  mutate(Period = as.factor(Period), 
+         Subject = as.factor(100 * as.integer(Lab) + Subject), 
+         Lab = as.factor(Lab),
+         Quantity = cantidad,
+         Price = precio,
+         MarketID = factor(10 * mercado + matching)) %>%
+  select(Period, Lab, Subject, MarketID, Quantity, Price)
+
+
+q1 <- T1 %>% select(Period, Subject, qT1 = Quantity)
+q2 <- T2 %>% select(Period, Subject, qT2 = Quantity)
+
+qall <- q1 %>% right_join(q2) %>%
+  mutate(dT2 = qT2 - qT1)
+
+p1 <- T1 %>% select(Period, Subject, pT1 = Price)
+p2 <- T2 %>% select(Period, Subject, pT2 = Price)
+
+pall <- p1 %>% right_join(p2) %>%
+  mutate(dT2 = pT2 - pT1)
 
 ```
 
@@ -31,7 +59,7 @@ Bt1 <- Bt1 %>% mutate(Period = as.factor(Period))
 
 * Dos empresas venden su producción en un mercado.
 * Cada empresa produce una variedad diferente de un mismo producto.
-* El coste de producción unitario de las dos empresas es de\ \(200\ €\).
+* El coste de producción unitario de las dos empresas es de\ \(200\) €/u.
 * Cada empresa decide simultáneamente a qué precio vende su producción.
 
 ## Demanda (I)
@@ -74,7 +102,7 @@ Bt1 <- Bt1 %>% mutate(Period = as.factor(Period))
 ## Costes
 - Los costes de las dos empresas son idénticos:
   \[
-    CMg_1 = CMg_2 = 200\ \text{€/u.}
+    CMg_1 = CMg_2 = 200 \text{€/u}
   \]
 - Derivada de los costes con respecto del precio:
   \[
@@ -119,9 +147,10 @@ Bt1 <- Bt1 %>% mutate(Period = as.factor(Period))
  
 ## Resultados del laboratorio
 
-- Sesiones del 16 de marzo (grupo F) y 31 de marzo (grupo A) de 2015.
-- Cada tratamiento estaba compuesto por 7 periodos.
-- Número de sujetos: `r NROW(Bt1)/7`.
+- Sesiones del 12 de abril de 2016.
+- Cada tratamiento estaba compuesto por `r length(levels(T1$Period))` periodos.
+- Número de sujetos:  `r length(levels(T1$Subject))`.
+
 
 ## Estadísticos descriptivos
 ### Precios
@@ -129,7 +158,7 @@ Bt1 <- Bt1 %>% mutate(Period = as.factor(Period))
 
 ```{r}
 
-kable(ddply (Bt1, .(Period), summTable, "precio"),
+kable(ddply (T1, .(Period), summTable, "Price"),
   digits = 1)      
 
 ```
@@ -140,10 +169,126 @@ kable(ddply (Bt1, .(Period), summTable, "precio"),
 
 ```{r}
 
-ggplot(Bt1, aes(Period, precio)) + 
+ggplot(T1, aes(Period, Price)) + 
   geom_boxplot(fill="orange", alpha = 0.3) +
   geom_hline(yintercept = 300, color = "DarkGreen", size = 1, alpha = 0.5) +
   ylab("p") 
+
+```
+
+## Tratamiento 2
+
+* Dos empresas venden su producción en un mercado.
+* Cada empresa produce una variedad diferente de un mismo producto.
+* El coste de producción unitario de las dos empresas es de\ \(200\) €/u.
+* Cada empresa decide simultáneamente la cantidad que produce y la demanda determina el precio al que se vende cada variedad.
+
+## Demanda
+
+- Curvas (inversas) de demanda de cada empresa:
+  \[\begin{gather*}
+    p_1 = 500 - \frac{1}{2} q_1 - \frac{1}{4} q_2 \\
+    p_2 = 500 - \frac{1}{4} q_1 - \frac{1}{2} q_2 
+    \end{gather*}
+  \]
+
+- Las demandas de las empresas son simétricas: obtenemos la curva de demanda de una de las empresas intercambiando los subíndices de la función de demanda de la otra empresa.
+
+- El sistema de demandas es el mismo que utilizamos en el Tratamiento 1.
+
+
+## Ingresos
+- Ingresos de la empresa 1:
+  \[
+    I_1 = p_1 q_1 = 500 q_1 - \frac{1}{2} q^2_1 - \frac{1}{4} q_1 q_2
+  \]
+- Derivada de los ingresos con respecto del precio:
+  \[
+     IMg_1 = 500 - q_1 - \frac{1}{4} q_2
+  \]
+
+## Costes
+- Los costes de las dos empresas son idénticos:
+  \[
+    CMg_1 = CMg_2 = 200\ \text{€/u.}
+  \]
+
+## Maximización de los beneficios
+- Condición de primer orden para la maximización de beneficios:
+  \[
+     IMg_1 = 500 - q^*_1 - \frac{1}{4} q_2
+     = 200 = CMg_1  
+  \]
+
+- Función de reacción de la empresa 1:
+  \[
+      q^*_1 = 300 - \frac{1}{4} q_2
+  \]
+
+## Equilibrio de Nash
+
+- Cada empresa obtiene los mejores resultados posibles, dadas las estrategias que han seleccionado sus rivales.
+  \[\begin{gather*}
+      q^*_1 = 300 - \frac{1}{4} q^*_2 \\
+      q^*_2 = 300 - \frac{1}{4} q^*_1 \\
+    \end{gather*}
+  \]
+
+## Equilibrio
+
+- En equilibrio, cada empresa elige el mismo nivel de producción: 
+  \[ q^*_1 = q^*_2 = 240\ \text{u.} \]
+- Sustituyendo las cantidades en las funciones de demanda, se obtienen los precios a los que se vende cada variedad:
+  \[ p^*_1 = p^*_2 = 320\ \text{€/u.} \]
+- Beneficios:
+  \[ \pi^*_1 = \pi^*_2 = (300 - 200) 240 = 28\,800\ \text{€} \].
+  
+ 
+## Estadísticos descriptivos
+### Cantidades
+
+
+```{r}
+
+kable(ddply (T2, .(Period), summTable, "Quantity"),
+  digits = 1)      
+
+```
+
+
+
+## Distribución de las cantidades
+
+```{r}
+
+ggplot(T2, aes(Period, Quantity)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = 240, color = "DarkGreen", size = 1, alpha = 0.5) +
+  ylab("q") 
+
+```
+
+## Comparación de los dos tratamientos
+### Cantidades
+
+```{r}
+
+ggplot(qall, aes(Period, dT2)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = -80/3, color = "DarkGreen", size = 1, alpha = 0.5) +
+  ylab(expression(q[2]-q[1])) 
+
+```
+
+## Comparación de los dos tratamientos
+### Precios
+
+```{r}
+
+ggplot(pall, aes(Period, dT2)) + 
+  geom_boxplot(fill="orange", alpha = 0.3) +
+  geom_hline(yintercept = 20, color = "DarkGreen", size = 1, alpha = 0.5) +
+  ylab(expression(p[2]-p[1])) 
 
 ```
 
